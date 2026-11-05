@@ -1,5 +1,7 @@
 # BarPocket
 
+**[简体中文](README.zh-CN.md) | [English](README.md)**
+
 **A lightweight macOS menu bar organizer with notch-aware management and a black notch mode.**
 
 BarPocket helps reclaim menu-bar space on MacBooks with a notch. It uses a draggable divider as a pocket boundary, offers an optional manager for menu-bar items exposed by macOS Accessibility, and can turn the full top menu-bar row black so the notch blends into it.
