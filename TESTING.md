@@ -2,6 +2,8 @@
 
 ## Automated checks
 
+`Scripts/check-localizations.py` checks that all source keys exist in both `en.lproj` and `zh-Hans.lproj`, and that format placeholders match. CI and Release run this check and lint both `.strings` tables.
+
 `./build.sh` performs the following checks:
 
 1. Compile all Swift sources into the app bundle.
@@ -20,6 +22,7 @@ The following behaviors depend on Window Server, menu-bar geometry, and the inst
 - Plug/unplug an external display while black notch mode is enabled.
 - Grant Accessibility permission and verify menu-bar inventory, item descriptions, and visible/behind-notch/off-screen classification.
 - Test `AXPress` and Command-drag against representative third-party menu-bar apps.
+- Change the macOS preferred language to Simplified Chinese and English in turn, relaunch BarPocket, and verify the menu, manager, alerts, and permission description follow the selected language. Other languages should fall back to English.
 - Replace an installed release and verify whether macOS asks the user to re-authorize Accessibility (expected to be possible with ad-hoc signatures).
 
 Do not claim that an AX action or drag is universally supported: macOS and individual apps may reject it.

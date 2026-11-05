@@ -6,7 +6,7 @@
 
 BarPocket helps reclaim menu-bar space on MacBooks with a notch. It uses a draggable divider as a pocket boundary, offers an optional manager for menu-bar items exposed by macOS Accessibility, and can turn the full top menu-bar row black so the notch blends into it.
 
-> Current distribution: Apple Silicon (arm64), macOS 13 or later. The app is ad-hoc signed and is not notarized by Apple. See [Installation](#installation-and-gatekeeper) before downloading a release.
+> Current distribution: Apple Silicon (arm64), macOS 13 or later. The app interface is available in English and Simplified Chinese and follows your macOS preferred language. The app is ad-hoc signed and is not notarized by Apple. See [Installation](#installation-and-gatekeeper) before downloading a release.
 
 ## Features
 
@@ -15,6 +15,7 @@ BarPocket helps reclaim menu-bar space on MacBooks with a notch. It uses a dragg
 - **Menu-bar manager:** optionally enumerate running apps' `AXExtrasMenuBar` items, search them, and classify them as visible, behind the notch, or off-screen.
 - **Explicit actions:** try `AXPress` on a selected item, or move a visible item into the pocket / restore an off-screen item when macOS exposes a usable position.
 - **Black notch mode:** draw a full-width black backing immediately beneath the system menu-bar window. The backing ignores mouse events, leaving native menu titles and status items interactive.
+- **English and Simplified Chinese UI:** follows the preferred language in macOS automatically; other languages fall back to English.
 - **Offline and lightweight:** no analytics, telemetry, network service, background daemon, or third-party runtime dependency.
 
 ## Installation and Gatekeeper
@@ -57,15 +58,15 @@ The build script runs the built-in layout self-tests, ad-hoc signs the app, and 
 
 ## CI and releases
 
-- Pull requests and pushes to `main` run the macOS ARM64 build, self-tests, and code-signature verification.
-- Creating a `v*` tag runs the release workflow, builds an ad-hoc signed app, packages ZIP and DMG files, writes `SHA256SUMS`, and publishes a GitHub Release.
+- Pull requests and pushes to `main` validate both localization tables and format placeholders, then run the macOS ARM64 build, self-tests, and code-signature verification.
+- Creating a `v*` tag validates localization resources, builds an ad-hoc signed app, packages ZIP and DMG files, writes `SHA256SUMS`, and publishes a GitHub Release.
 - Public repositories use GitHub's standard hosted runners at no charge. No Apple Developer membership or signing secrets are required.
 
 Example release:
 
 ```sh
-git tag v0.3.1
-git push origin v0.3.1
+git tag v0.4.0
+git push origin v0.4.0
 ```
 
 The tag version must match `CFBundleShortVersionString` in `Info.plist`.

@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.4.0
+
+- Add native Simplified Chinese and English localization for the menu bar, manager window, alerts, help, tooltips, and Accessibility usage description.
+- Automatically follow the macOS preferred language; fall back to English for other languages.
+- Add localization resource and format-placeholder checks to CI and release builds.
+
 ## 0.3.1
 
 - Rename the user-facing app and distribution bundle to BarPocket.

@@ -3,12 +3,14 @@
 <plist version="1.0"><dict>
  <key>CFBundleIdentifier</key><string>com.aniss.menubarpocket</string>
  <key>CFBundleName</key><string>BarPocket</string>
+ <key>CFBundleDevelopmentRegion</key><string>en</string>
+ <key>CFBundleLocalizations</key><array><string>en</string><string>zh-Hans</string></array>
  <key>CFBundleDisplayName</key><string>BarPocket</string>
  <key>CFBundleExecutable</key><string>MenuBarPocket</string>
  <key>CFBundlePackageType</key><string>APPL</string>
- <key>CFBundleShortVersionString</key><string>0.3.1</string>
- <key>NSAccessibilityUsageDescription</key><string>BarPocket 使用辅助功能读取菜单栏项目的名称和位置，以便管理被刘海遮挡或挤出屏幕的图标。</string>
- <key>CFBundleVersion</key><string>4</string>
+ <key>CFBundleShortVersionString</key><string>0.4.0</string>
+ <key>NSAccessibilityUsageDescription</key><string>BarPocket uses Accessibility to read menu-bar item names and positions so you can manage icons hidden behind the notch or pushed off-screen.</string>
+ <key>CFBundleVersion</key><string>5</string>
  <key>CFBundleIconFile</key><string>AppIcon</string>
  <key>LSMinimumSystemVersion</key><string>13.0</string>
  <key>LSUIElement</key><true/>

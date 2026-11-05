@@ -6,6 +6,10 @@ INSTALL="${HOME}/Applications/BarPocket.app"
 mkdir -p "$OUT/Contents/MacOS" "$OUT/Contents/Resources"
 cp "$ROOT/Info.plist" "$OUT/Contents/Info.plist"
 cp "$ROOT/Resources/AppIcon.icns" "$OUT/Contents/Resources/AppIcon.icns"
+for localization in "$ROOT"/Resources/*.lproj; do
+  [[ -d "$localization" ]] || continue
+  /usr/bin/ditto "$localization" "$OUT/Contents/Resources/${localization:t}"
+done
 xcrun swiftc -O -framework AppKit -framework ServiceManagement -framework ApplicationServices -framework CoreGraphics -o "$OUT/Contents/MacOS/MenuBarPocket" "$ROOT"/Sources/*.swift
 "$OUT/Contents/MacOS/MenuBarPocket" --self-test
 codesign --force --sign - "$OUT"

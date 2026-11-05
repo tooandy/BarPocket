@@ -1,0 +1,4 @@
+/* Generated localization strings. Keep keys in sync with the other language. */
+"CFBundleDisplayName" = "BarPocket";
+"CFBundleName" = "BarPocket";
+"NSAccessibilityUsageDescription" = "BarPocket uses Accessibility to read menu-bar item names and positions so you can manage icons hidden behind the notch or pushed off-screen.";

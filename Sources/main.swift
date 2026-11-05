@@ -2,7 +2,7 @@ import AppKit
 import Foundation
 import ServiceManagement
 
-// BarPocket v0.3.1: offline menu-bar pocket, Accessibility inventory, and notch blackout.
+// BarPocket v0.4.0: localized offline menu-bar pocket, Accessibility inventory, and notch blackout.
 // Cross-app discovery is opt-in; actions are only performed after an explicit user click.
 
 enum PocketLayout {
@@ -57,7 +57,7 @@ final class PocketController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         divider.isVisible = true
         divider.button?.title = "│"
         divider.button?.font = NSFont.monospacedSystemFont(ofSize: 12, weight: .light)
-        divider.button?.toolTip = "收纳分隔线：按住 ⌘ 拖动，左边的图标将被收纳"
+        divider.button?.toolTip = tr("tooltip.divider")
 
         menu.delegate = self
         notchBlackoutController.setEnabled(prefs.bool(forKey: notchBlackoutKey))
@@ -118,7 +118,7 @@ final class PocketController: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func updateVisuals() {
         let symbol = isCollapsed ? "chevron.right" : "chevron.left"
-        let hint = isCollapsed ? "展开已收纳图标" : "收纳分隔线左侧的图标"
+        let hint = isCollapsed ? tr("tooltip.toggle.expand") : tr("tooltip.toggle.collapse")
         if let image = NSImage(systemSymbolName: symbol, accessibilityDescription: hint) {
             image.isTemplate = true
             toggle.button?.image = image
@@ -126,8 +126,8 @@ final class PocketController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         } else {
             toggle.button?.title = isCollapsed ? "›" : "‹"
         }
-        toggle.button?.toolTip = "\(hint)；右键打开设置"
-        divider.button?.toolTip = "分隔线：按住 ⌘ 拖到常驻图标的左侧"
+        toggle.button?.toolTip = "\(hint) · \(tr("tooltip.toggle.right_click"))"
+        divider.button?.toolTip = tr("tooltip.divider")
     }
 
     private func scheduleCollapseIfNeeded() {
@@ -158,48 +158,48 @@ final class PocketController: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     private func rebuildMenu() {
         menu.removeAllItems()
-        let state = NSMenuItem(title: isCollapsed ? "展开全部图标" : "收起左侧图标", action: #selector(menuToggle(_:)), keyEquivalent: "")
+        let state = NSMenuItem(title: isCollapsed ? tr("menu.expand_all") : tr("menu.collapse_left"), action: #selector(menuToggle(_:)), keyEquivalent: "")
         state.target = self
         menu.addItem(state)
         menu.addItem(.separator())
 
-        let blackout = NSMenuItem(title: "刘海隐身模式（顶部黑色）", action: #selector(toggleNotchBlackout(_:)), keyEquivalent: "")
+        let blackout = NSMenuItem(title: tr("menu.notch_blackout"), action: #selector(toggleNotchBlackout(_:)), keyEquivalent: "")
         blackout.target = self
         blackout.state = notchBlackoutController.isEnabled ? .on : .off
         blackout.isEnabled = notchBlackoutController.supportsCurrentDisplay
         menu.addItem(blackout)
         menu.addItem(.separator())
 
-        let tip = NSMenuItem(title: "⌘ 拖动图标到分隔线左侧进行收纳", action: nil, keyEquivalent: "")
+        let tip = NSMenuItem(title: tr("menu.drag_tip"), action: nil, keyEquivalent: "")
         tip.isEnabled = false
         menu.addItem(tip)
 
         let collapseMenu = NSMenu()
         for seconds in [0, 5, 15, 30] {
-            let title = seconds == 0 ? "关闭" : "\(seconds) 秒"
+            let title = seconds == 0 ? tr("menu.off") : trf("menu.seconds", seconds)
             let option = NSMenuItem(title: title, action: #selector(changeDelay(_:)), keyEquivalent: "")
             option.target = self
             option.tag = seconds
             option.state = prefs.integer(forKey: autoCollapseKey) == seconds ? .on : .off
             collapseMenu.addItem(option)
         }
-        let collapseItem = NSMenuItem(title: "展开后自动收起", action: nil, keyEquivalent: "")
+        let collapseItem = NSMenuItem(title: tr("menu.auto_collapse"), action: nil, keyEquivalent: "")
         collapseItem.submenu = collapseMenu
         menu.addItem(collapseItem)
 
-        let login = NSMenuItem(title: "登录时启动", action: #selector(changeLogin(_:)), keyEquivalent: "")
+        let login = NSMenuItem(title: tr("menu.login"), action: #selector(changeLogin(_:)), keyEquivalent: "")
         login.target = self
         login.state = SMAppService.mainApp.status == .enabled ? .on : .off
         menu.addItem(login)
         menu.addItem(.separator())
 
-        let manager = NSMenuItem(title: "打开菜单栏管理器…", action: #selector(openManager(_:)), keyEquivalent: "m")
+        let manager = NSMenuItem(title: tr("menu.manager"), action: #selector(openManager(_:)), keyEquivalent: "m")
         manager.target = self
         menu.addItem(manager)
-        let help = NSMenuItem(title: "使用说明与权限", action: #selector(showHelp(_:)), keyEquivalent: "")
+        let help = NSMenuItem(title: tr("menu.help"), action: #selector(showHelp(_:)), keyEquivalent: "")
         help.target = self
         menu.addItem(help)
-        let quit = NSMenuItem(title: "退出 BarPocket", action: #selector(quit(_:)), keyEquivalent: "q")
+        let quit = NSMenuItem(title: tr("menu.quit"), action: #selector(quit(_:)), keyEquivalent: "q")
         quit.target = self
         menu.addItem(quit)
     }
@@ -231,7 +231,7 @@ final class PocketController: NSObject, NSApplicationDelegate, NSMenuDelegate {
                 try SMAppService.mainApp.register()
             }
         } catch {
-            showAlert(title: "未能更改登录启动", message: "系统返回：\(error.localizedDescription)\n\n你也可以在「系统设置 → 通用 → 登录项」里检查。")
+            showAlert(title: tr("alert.login_failed.title"), message: trf("alert.login_failed.message", error.localizedDescription as NSString))
         }
     }
 
@@ -255,7 +255,7 @@ final class PocketController: NSObject, NSApplicationDelegate, NSMenuDelegate {
 
     @objc private func showHelp(_ sender: NSMenuItem) {
         recordInteraction()
-        showAlert(title: "BarPocket · 使用说明", message: "1. 点击箭头展开或收起收纳区。\n2. 右键箭头 → 可开启「刘海隐身模式」，将刘海屏最顶部整行背景变为黑色，同时保留菜单栏图标和点击操作。\n3. 按住 ⌘ 拖动图标可调整其相对分隔线的位置。\n4. 打开菜单栏管理器，可扫描刘海遮挡和屏幕外图标。\n\n管理器需要你主动授予辅助功能权限，只读取菜单栏项目名称、所属应用和位置；点击按钮时才会尝试打开菜单或模拟 ⌘ 拖动。\n\n不申请屏幕录制、输入监控或管理员权限，不联网。macOS 和个别 App 可能不支持移动或 AXPress。")
+        showAlert(title: tr("help.title"), message: tr("help.message"))
     }
 
     @objc private func quit(_ sender: NSMenuItem) { NSApp.terminate(nil) }
@@ -265,7 +265,7 @@ final class PocketController: NSObject, NSApplicationDelegate, NSMenuDelegate {
         alert.messageText = title
         alert.informativeText = message
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "知道了")
+        alert.addButton(withTitle: tr("alert.dismiss"))
         alert.runModal()
     }
 }
@@ -282,8 +282,8 @@ func selfTest() -> Bool {
             fputs("FAILED CASE \(index)\n", stderr)
         }
     }
-    guard passed == cases.count, PocketLayout.duration(-8) == 0 else { return false }
-    print("PASS: layout self-tests (\(passed + 1) cases)")
+    guard passed == cases.count, PocketLayout.duration(-8) == 0, BarPocketLocalization.validateResources() else { return false }
+    print("PASS: layout and localization self-tests (\(passed + 1) cases)")
     return true
 }
 

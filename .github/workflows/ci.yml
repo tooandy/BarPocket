@@ -33,6 +33,12 @@ jobs:
       - name: Validate metadata
         run: plutil -lint Info.plist
 
+      - name: Validate localization resources
+        run: |
+          plutil -lint Resources/en.lproj/Localizable.strings Resources/zh-Hans.lproj/Localizable.strings
+          plutil -lint Resources/en.lproj/InfoPlist.strings Resources/zh-Hans.lproj/InfoPlist.strings
+          python3 Scripts/check-localizations.py
+
       - name: Build and run self-tests
         run: ./build.sh
 

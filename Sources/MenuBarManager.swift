@@ -4,10 +4,18 @@ import CoreGraphics
 
 // MARK: - Accessibility inventory
 
-enum MenuBarItemVisibility: String {
-    case visible = "可见"
-    case behindNotch = "刘海遮挡"
-    case offscreen = "屏幕外"
+enum MenuBarItemVisibility {
+    case visible
+    case behindNotch
+    case offscreen
+
+    var localizedTitle: String {
+        switch self {
+        case .visible: return tr("manager.visibility.visible")
+        case .behindNotch: return tr("manager.visibility.behind_notch")
+        case .offscreen: return tr("manager.visibility.offscreen")
+        }
+    }
 }
 
 struct MenuBarRecord: Identifiable {
@@ -41,7 +49,7 @@ enum MenuBarAccessibilityScanner {
         let ownPID = ProcessInfo.processInfo.processIdentifier
         let apps = NSWorkspace.shared.runningApplications
             .filter { $0.processIdentifier != ownPID && $0.bundleURL?.pathExtension == "app" }
-            .map { AppSnapshot(pid: $0.processIdentifier, name: $0.localizedName ?? $0.bundleIdentifier ?? "未知应用", bundleIdentifier: $0.bundleIdentifier, icon: $0.icon) }
+            .map { AppSnapshot(pid: $0.processIdentifier, name: $0.localizedName ?? $0.bundleIdentifier ?? tr("manager.unknown_app"), bundleIdentifier: $0.bundleIdentifier, icon: $0.icon) }
         let notch = notchRange()
         let screenMaxX = NSScreen.screens.first(where: { $0.safeAreaInsets.top > 0 })?.frame.maxX
             ?? NSScreen.main?.frame.maxX ?? 0
@@ -220,19 +228,19 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
     private var scanInProgress = false
     private var moveInProgress = false
 
-    private let titleLabel = NSTextField(labelWithString: "菜单栏项目")
+    private let titleLabel = NSTextField(labelWithString: tr("manager.title"))
     private let countLabel = NSTextField(labelWithString: "")
-    private let permissionLabel = NSTextField(wrappingLabelWithString: "要发现被刘海遮挡或挤出屏幕的图标，需要读取 macOS 的菜单栏辅助功能树。只读取应用名称、图标描述和位置，不读取屏幕内容。")
-    private let permissionButton = NSButton(title: "开启辅助功能权限…", target: nil, action: nil)
-    private let refreshButton = NSButton(title: "刷新", target: nil, action: nil)
-    private let filterControl = NSSegmentedControl(labels: ["全部", "刘海遮挡", "屏幕外", "可见"], trackingMode: .selectOne, target: nil, action: nil)
+    private let permissionLabel = NSTextField(wrappingLabelWithString: tr("manager.permission.description"))
+    private let permissionButton = NSButton(title: tr("manager.permission.enable"), target: nil, action: nil)
+    private let refreshButton = NSButton(title: tr("manager.refresh"), target: nil, action: nil)
+    private let filterControl = NSSegmentedControl(labels: [tr("manager.filter.all"), tr("manager.filter.behind_notch"), tr("manager.filter.offscreen"), tr("manager.filter.visible")], trackingMode: .selectOne, target: nil, action: nil)
     private let searchField = NSSearchField()
     private let tableView = NSTableView()
     private let scrollView = NSScrollView()
-    private let openButton = NSButton(title: "打开菜单", target: nil, action: nil)
-    private let pocketButton = NSButton(title: "移入收纳区", target: nil, action: nil)
-    private let restoreButton = NSButton(title: "恢复到可见区", target: nil, action: nil)
-    private let footerLabel = NSTextField(wrappingLabelWithString: "图标使用所属 App 的应用图标作为标识，不截图提取真实菜单栏图像。移动操作会模拟一次 ⌘ 拖动。")
+    private let openButton = NSButton(title: tr("manager.button.open"), target: nil, action: nil)
+    private let pocketButton = NSButton(title: tr("manager.button.pocket"), target: nil, action: nil)
+    private let restoreButton = NSButton(title: tr("manager.button.restore"), target: nil, action: nil)
+    private let footerLabel = NSTextField(wrappingLabelWithString: tr("manager.footer"))
     private let permissionRow = NSStackView()
 
     init(
@@ -251,7 +259,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
             backing: .buffered,
             defer: false
         )
-        window.title = "BarPocket · 菜单栏管理器"
+        window.title = tr("manager.window_title")
         window.minSize = NSSize(width: 680, height: 480)
         window.center()
         super.init(window: window)
@@ -273,7 +281,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         countLabel.font = .systemFont(ofSize: 12)
         permissionLabel.font = .systemFont(ofSize: 12)
         permissionLabel.textColor = .secondaryLabelColor
-        permissionLabel.maximumNumberOfLines = 2
+        permissionLabel.maximumNumberOfLines = 3
         permissionButton.bezelStyle = .rounded
         permissionButton.target = self
         permissionButton.action = #selector(requestPermission)
@@ -283,7 +291,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         filterControl.selectedSegment = 0
         filterControl.target = self
         filterControl.action = #selector(filterChanged)
-        searchField.placeholderString = "搜索应用或图标"
+        searchField.placeholderString = tr("manager.search.placeholder")
         searchField.target = self
         searchField.action = #selector(filterChanged)
         searchField.sendsSearchStringImmediately = true
@@ -300,7 +308,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         restoreButton.action = #selector(restoreSelected)
         footerLabel.font = .systemFont(ofSize: 11)
         footerLabel.textColor = .secondaryLabelColor
-        footerLabel.maximumNumberOfLines = 2
+        footerLabel.maximumNumberOfLines = 3
 
         permissionRow.orientation = .horizontal
         permissionRow.alignment = .centerY
@@ -358,10 +366,10 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         tableView.delegate = self
         tableView.dataSource = self
         let columns: [(String, String, CGFloat)] = [
-            ("app", "应用", 175),
-            ("detail", "图标描述", 205),
-            ("visibility", "位置状态", 105),
-            ("x", "横向位置", 100)
+            ("app", tr("manager.column.app"), 175),
+            ("detail", tr("manager.column.detail"), 205),
+            ("visibility", tr("manager.column.visibility"), 115),
+            ("x", tr("manager.column.position"), 100)
         ]
         for (identifier, title, width) in columns {
             let column = NSTableColumn(identifier: NSUserInterfaceItemIdentifier(identifier))
@@ -382,12 +390,12 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
             allItems = []
             applyFilter()
             updatePermissionState()
-            countLabel.stringValue = "等待授权"
+            countLabel.stringValue = tr("manager.status.waiting_permission")
             return
         }
         scanInProgress = true
         refreshButton.isEnabled = false
-        countLabel.stringValue = "扫描中…"
+        countLabel.stringValue = tr("manager.status.scanning")
         updatePermissionState()
         MenuBarAccessibilityScanner.scan { [weak self] records in
             guard let self else { return }
@@ -397,7 +405,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
             self.applyFilter()
             let hidden = records.filter { $0.visibility != .visible }.count
             let notch = records.filter { $0.visibility == .behindNotch }.count
-            self.countLabel.stringValue = "\(records.count) 项 · \(hidden) 项不可见（刘海 \(notch)）"
+            self.countLabel.stringValue = trf("manager.status.count", records.count, hidden, notch)
         }
     }
 
@@ -406,14 +414,14 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         permissionRow.isHidden = trusted
         refreshButton.isEnabled = trusted && !scanInProgress && !moveInProgress
         if !trusted {
-            countLabel.stringValue = "需要辅助功能授权"
+            countLabel.stringValue = tr("manager.status.permission_required")
         }
     }
 
     @objc private func requestPermission() {
         MenuBarAccessibilityScanner.requestAccess()
-        permissionLabel.stringValue = "请在系统设置 → 隐私与安全性 → 辅助功能中启用 BarPocket，然后返回这里点击「刷新」。"
-        countLabel.stringValue = "等待系统授权…"
+        permissionLabel.stringValue = tr("manager.permission.instructions")
+        countLabel.stringValue = tr("manager.status.waiting_system")
         if let url = URL(string: "x-apple.systempreferences:com.apple.settings.PrivacySecurity.extension?Privacy_Accessibility") {
             NSWorkspace.shared.open(url)
         }
@@ -469,8 +477,8 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         } else {
             let text: String
             switch column.identifier.rawValue {
-            case "detail": text = item.detail.isEmpty ? "菜单栏项目" : item.detail
-            case "visibility": text = item.visibility.rawValue
+            case "detail": text = item.detail.isEmpty ? tr("manager.fallback_item") : item.detail
+            case "visibility": text = item.visibility.localizedTitle
             case "x": text = String(format: "x = %.0f", item.frame.minX)
             default: text = ""
             }
@@ -519,7 +527,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         guard let item = selectedItem else { return }
         let result = MenuBarAccessibilityScanner.press(item)
         if result != .success {
-            showMessage("无法打开菜单", "\(item.appName) 没有响应辅助功能的 AXPress 操作（错误码 \(result.rawValue)）。某些应用的自绘菜单不支持此操作。")
+            showMessage(tr("manager.alert.open_failed.title"), trf("manager.alert.open_failed.message", item.appName as NSString, result.rawValue))
         }
     }
 
@@ -543,18 +551,18 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
                 guard let self else { return }
                 guard let fresh = refreshed.first(where: { $0.id == selected.id }) else {
                     self.finishMove(previousCollapsed: previousCollapsed)
-                    self.showMessage("图标已变化", "目标应用可能已退出或重建了菜单栏项目。请刷新列表后重试。")
+                    self.showMessage(tr("manager.alert.item_changed.title"), tr("manager.alert.item_changed.message"))
                     return
                 }
                 guard fresh.visibility == .visible,
                       MenuBarAccessibilityScanner.isPhysicallyVisible(fresh.frame) else {
                     self.finishMove(previousCollapsed: previousCollapsed)
-                    self.showMessage("当前无法拖动", "该图标仍位于刘海遮挡区或屏幕外。可以先减少菜单栏项目、关闭其他收纳工具，再刷新后重试。你仍可尝试使用「打开菜单」激活它。")
+                    self.showMessage(tr("manager.alert.cannot_drag.title"), tr("manager.alert.cannot_drag.message"))
                     return
                 }
                 guard let separator = self.dividerFrame(), separator.width < 200 else {
                     self.finishMove(previousCollapsed: previousCollapsed)
-                    self.showMessage("分隔线暂不可用", "没有取得可见的收纳分隔线位置，请稍后刷新重试。")
+                    self.showMessage(tr("manager.alert.divider_unavailable.title"), tr("manager.alert.divider_unavailable.message"))
                     return
                 }
 
@@ -562,12 +570,12 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
                 let isRightOfDivider = fresh.frame.minX >= separator.maxX
                 if toPocket && isLeftOfDivider {
                     self.finishMove(previousCollapsed: previousCollapsed)
-                    self.showMessage("已经在收纳区", "这个图标已经位于分隔线左侧。收起菜单栏口袋即可将它隐藏。")
+                    self.showMessage(tr("manager.alert.already_in_pocket.title"), tr("manager.alert.already_in_pocket.message"))
                     return
                 }
                 if !toPocket && isRightOfDivider {
                     self.finishMove(previousCollapsed: previousCollapsed)
-                    self.showMessage("已经在常驻区", "这个图标已经位于分隔线右侧，无需恢复。")
+                    self.showMessage(tr("manager.alert.already_in_persistent.title"), tr("manager.alert.already_in_persistent.message"))
                     return
                 }
 
@@ -576,7 +584,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
                     ?? NSScreen.main?.frame.maxX ?? 0
                 guard targetX > 0, screenMaxX <= 0 || targetX < screenMaxX - 2 else {
                     self.finishMove(previousCollapsed: previousCollapsed)
-                    self.showMessage("没有足够的菜单栏空间", "当前菜单栏右侧没有足够位置完成拖动。请先暂时隐藏一个常驻图标，再重试。")
+                    self.showMessage(tr("manager.alert.no_space.title"), tr("manager.alert.no_space.message"))
                     return
                 }
 
@@ -604,7 +612,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         alert.messageText = title
         alert.informativeText = message
         alert.alertStyle = .informational
-        alert.addButton(withTitle: "知道了")
+        alert.addButton(withTitle: tr("alert.dismiss"))
         alert.beginSheetModal(for: window!)
     }
 }

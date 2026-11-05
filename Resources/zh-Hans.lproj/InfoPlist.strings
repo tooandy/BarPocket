@@ -1,0 +1,4 @@
+/* Generated localization strings. Keep keys in sync with the other language. */
+"CFBundleDisplayName" = "BarPocket";
+"CFBundleName" = "BarPocket";
+"NSAccessibilityUsageDescription" = "BarPocket 使用辅助功能读取菜单栏项目的名称和位置，以便管理被刘海遮挡或挤出屏幕的图标。";

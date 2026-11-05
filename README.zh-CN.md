@@ -6,7 +6,7 @@
 
 BarPocket 帮助刘海屏 MacBook 释放菜单栏空间。它使用可拖动的分界线作为收纳区边界，提供一个可选的菜单栏管理器（读取 macOS Accessibility 暴露的菜单栏项目），还可以将顶部整行菜单栏背景变为黑色，让屏幕刘海自然融入其中。
 
-> 当前发行版本面向 Apple Silicon（arm64），要求 macOS 13 或更高版本。应用使用 Ad-hoc 签名，**未经 Apple 公证**。下载前请阅读[安装与 Gatekeeper](#安装与-gatekeeper)。
+> 当前发行版本面向 Apple Silicon（arm64），要求 macOS 13 或更高版本。界面支持简体中文和英文，会根据 macOS 首选语言自动切换；其他语言默认回退到英文。应用使用 Ad-hoc 签名，**未经 Apple 公证**。下载前请阅读[安装与 Gatekeeper](#安装与-gatekeeper)。
 
 ## 功能特性
 
@@ -15,6 +15,7 @@ BarPocket 帮助刘海屏 MacBook 释放菜单栏空间。它使用可拖动的�
 - **菜单栏管理器：** 可选扫描正在运行的应用通过 `AXExtrasMenuBar` 暴露的菜单栏项目，支持搜索，并将项目分类为可见、被刘海遮挡或位于屏幕范围之外。
 - **显式操作：** 对选中的项目尝试执行 `AXPress`；当 macOS 提供可用的位置时，也可以将可见项目移入收纳区，或恢复屏幕外的项目。
 - **黑色刘海模式：** 在系统菜单栏窗口下方绘制一层横跨屏幕的黑色背景。该背景会忽略鼠标事件，因此原生菜单标题和状态栏项目仍可交互。
+- **中英文界面：** 自动跟随 macOS 首选语言；其他语言回退到英文。
 - **离线且轻量：** 不包含分析统计、遥测、网络服务、后台守护进程或第三方运行时依赖。
 
 ## 安装与 Gatekeeper
@@ -57,15 +58,15 @@ open dist/BarPocket.app
 
 ## CI 与版本发布
 
-- Pull Request 和推送到 `main` 分支时，会自动运行 macOS ARM64 构建、布局自测和代码签名验证。
-- 推送 `v*` 格式的 Tag 时，会触发 Release 工作流：构建 Ad-hoc 签名应用，打包 ZIP 和 DMG，生成 `SHA256SUMS`，并发布 GitHub Release。
+- Pull Request 和推送到 `main` 分支时，会先校验两套本地化资源及格式占位符，再运行 macOS ARM64 构建、布局自测和代码签名验证。
+- 推送 `v*` 格式的 Tag 时，会触发 Release 工作流：校验本地化资源，构建 Ad-hoc 签名应用，打包 ZIP 和 DMG，生成 `SHA256SUMS`，并发布 GitHub Release。
 - 对公开仓库，GitHub 标准托管 Runner 在免费额度范围内可免费使用。不需要 Apple Developer 会员资格或签名 Secrets。
 
 发布示例：
 
 ```sh
-git tag v0.3.1
-git push origin v0.3.1
+git tag v0.4.0
+git push origin v0.4.0
 ```
 
 Tag 版本必须与 `Info.plist` 中的 `CFBundleShortVersionString` 一致。

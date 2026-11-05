@@ -35,6 +35,12 @@ jobs:
           fi
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
 
+      - name: Validate localization resources
+        run: |
+          plutil -lint Resources/en.lproj/Localizable.strings Resources/zh-Hans.lproj/Localizable.strings
+          plutil -lint Resources/en.lproj/InfoPlist.strings Resources/zh-Hans.lproj/InfoPlist.strings
+          python3 Scripts/check-localizations.py
+
       - name: Build, self-test, and ad-hoc sign
         run: ./build.sh
 
