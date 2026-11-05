@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  pull_request:
+  push:
+    branches: [main]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+concurrency:
+  group: ci-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  build:
+    name: Build and test (Apple Silicon)
+    runs-on: macos-15
+    timeout-minutes: 20
+    steps:
+      - name: Check out source
+        uses: actions/checkout@v4
+
+      - name: Show toolchain
+        run: |
+          sw_vers
+          swift --version
+          xcodebuild -version
+
+      - name: Validate metadata
+        run: plutil -lint Info.plist
+
+      - name: Build and run self-tests
+        run: ./build.sh
+
+      - name: Verify app signature
+        run: codesign --verify --deep --strict dist/BarPocket.app
+
+      - name: Package CI artifact
+        run: ditto -c -k --sequesterRsrc --keepParent dist/BarPocket.app dist/BarPocket-ci-arm64.zip
+
+      - name: Upload app bundle
+        uses: actions/upload-artifact@v4
+        with:
+          name: BarPocket-ci-arm64
+          path: dist/BarPocket-ci-arm64.zip
+          if-no-files-found: error
+          retention-days: 7

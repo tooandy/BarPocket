@@ -1,0 +1,20 @@
+.DS_Store
+.AppleDouble
+.LSOverride
+
+# Local build products
+/dist/
+/build/
+/DerivedData/
+/.build/
+.swiftpm/
+
+# Xcode / SwiftPM user state
+*.xcuserstate
+*.xccheckout
+*.moved-aside
+*.hmap
+
+# Local editor files
+.vscode/
+.idea/
