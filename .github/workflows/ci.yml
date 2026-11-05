@@ -35,8 +35,9 @@ jobs:
 
       - name: Validate localization resources
         run: |
-          plutil -lint Resources/en.lproj/Localizable.strings Resources/zh-Hans.lproj/Localizable.strings
-          plutil -lint Resources/en.lproj/InfoPlist.strings Resources/zh-Hans.lproj/InfoPlist.strings
+          for file in Resources/*.lproj/*.strings; do
+            plutil -lint "$file"
+          done
           python3 Scripts/check-localizations.py
 
       - name: Build and run self-tests

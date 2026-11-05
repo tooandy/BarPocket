@@ -1,0 +1,4 @@
+/* Localized app metadata. */
+"CFBundleDisplayName" = "BarPocket";
+"CFBundleName" = "BarPocket";
+"NSAccessibilityUsageDescription" = "BarPocket gebruikt toegankelijkheid om namen en posities van menubalkonderdelen te lezen, zodat je pictogrammen achter de notch of buiten het scherm kunt beheren.";

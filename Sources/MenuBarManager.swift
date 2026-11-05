@@ -254,13 +254,13 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         self.dividerFrame = dividerFrame
         self.setOperationInProgress = setOperationInProgress
         let window = NSWindow(
-            contentRect: NSRect(x: 0, y: 0, width: 780, height: 590),
+            contentRect: NSRect(x: 0, y: 0, width: 860, height: 610),
             styleMask: [.titled, .closable, .miniaturizable, .resizable],
             backing: .buffered,
             defer: false
         )
         window.title = tr("manager.window_title")
-        window.minSize = NSSize(width: 680, height: 480)
+        window.minSize = NSSize(width: 780, height: 500)
         window.center()
         super.init(window: window)
         configureWindow()
@@ -324,7 +324,7 @@ final class MenuBarManagerWindowController: NSWindowController, NSTableViewDataS
         filters.orientation = .horizontal
         filters.alignment = .centerY
         filters.spacing = 12
-        searchField.widthAnchor.constraint(equalToConstant: 220).isActive = true
+        searchField.widthAnchor.constraint(equalToConstant: 180).isActive = true
 
         let actions = NSStackView(views: [openButton, pocketButton, restoreButton, NSView()])
         actions.orientation = .horizontal

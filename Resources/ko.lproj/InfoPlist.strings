@@ -1,0 +1,4 @@
+/* Localized app metadata. */
+"CFBundleDisplayName" = "BarPocket";
+"CFBundleName" = "BarPocket";
+"NSAccessibilityUsageDescription" = "BarPocket은 손쉬운 사용 기능으로 메뉴 막대 항목의 이름과 위치를 읽어 노치에 가리거나 화면 밖으로 밀려난 아이콘을 관리합니다.";

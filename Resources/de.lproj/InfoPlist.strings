@@ -1,0 +1,4 @@
+/* Localized app metadata. */
+"CFBundleDisplayName" = "BarPocket";
+"CFBundleName" = "BarPocket";
+"NSAccessibilityUsageDescription" = "BarPocket verwendet Bedienungshilfen, um Namen und Positionen von Menüleistensymbolen auszulesen, damit du Symbole hinter der Notch oder außerhalb des Bildschirms verwalten kannst.";

@@ -1,0 +1,4 @@
+/* Localized app metadata. */
+"CFBundleDisplayName" = "BarPocket";
+"CFBundleName" = "BarPocket";
+"NSAccessibilityUsageDescription" = "BarPocket はアクセシビリティ機能を使用してメニューバー項目の名前と位置を読み取り、ノッチの裏や画面外にあるアイコンを管理します。";

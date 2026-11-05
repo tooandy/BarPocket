@@ -1,5 +1,11 @@
 # Changelog
 
+## 0.5.0
+
+- Add complete Spanish, Korean, Japanese, German, French, Dutch, and Traditional Chinese UI translations (nine supported languages total).
+- Localize Accessibility permission descriptions, alerts, help, manager, and menus for all supported languages.
+- Extend CI localization coverage and keep long-language filter labels compact for narrow windows.
+
 ## 0.4.0
 
 - Add native Simplified Chinese and English localization for the menu bar, manager window, alerts, help, tooltips, and Accessibility usage description.

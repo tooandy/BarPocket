@@ -1,0 +1,4 @@
+/* Localized app metadata. */
+"CFBundleDisplayName" = "BarPocket";
+"CFBundleName" = "BarPocket";
+"NSAccessibilityUsageDescription" = "BarPocket 使用輔助使用功能讀取選單列項目的名稱和位置，以便管理被瀏海遮住或擠出螢幕的圖示。";

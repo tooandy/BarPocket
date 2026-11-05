@@ -12,7 +12,7 @@ func trf(_ key: String, _ arguments: CVarArg...) -> String {
 enum BarPocketLocalization {
     static func validateResources() -> Bool {
         let requiredKeys = ["menu.notch_blackout", "manager.title", "help.message"]
-        for language in ["en", "zh-Hans"] {
+        for language in ["en", "zh-Hans", "zh-Hant", "es", "ko", "ja", "de", "fr", "nl"] {
             guard let path = Bundle.main.path(forResource: language, ofType: "lproj"),
                   let bundle = Bundle(path: path) else {
                 fputs("Missing localization bundle: \(language)\n", stderr)

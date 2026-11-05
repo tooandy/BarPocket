@@ -3,9 +3,10 @@
 from pathlib import Path
 import re
 import sys
+import plistlib
 
 ROOT = Path(__file__).resolve().parents[1]
-LANGUAGES = ("en", "zh-Hans")
+LANGUAGES = ("en", "zh-Hans", "zh-Hant", "es", "ko", "ja", "de", "fr", "nl")
 
 
 def keys(path: Path) -> set[str]:
@@ -25,6 +26,12 @@ def main() -> int:
     base = ROOT / "Resources" / f"{LANGUAGES[0]}.lproj" / "Localizable.strings"
     base_keys = keys(base)
     errors = []
+    metadata = plistlib.loads((ROOT / "Info.plist").read_bytes())
+    if set(metadata.get("CFBundleLocalizations", [])) != set(LANGUAGES):
+        errors.append("Info.plist CFBundleLocalizations does not match LANGUAGES")
+    declared = {p.name.removesuffix(".lproj") for p in (ROOT / "Resources").glob("*.lproj")}
+    if declared != set(LANGUAGES):
+        errors.append(f"Resource directories do not match LANGUAGES: {sorted(declared ^ set(LANGUAGES))}")
 
     for language in LANGUAGES:
         table = ROOT / "Resources" / f"{language}.lproj" / "Localizable.strings"
@@ -33,6 +40,8 @@ def main() -> int:
             errors.append(f"{language}: missing localization table or InfoPlist.strings")
             continue
         current = keys(table)
+        if len(re.findall(r'^\s*"((?:\\.|[^"])*)"\s*=', table.read_text(encoding="utf-8"), re.MULTILINE)) != len(current):
+            errors.append(f"{language}: duplicate localization key(s)")
         missing = base_keys - current
         extra = current - base_keys
         if missing:
@@ -50,10 +59,11 @@ def main() -> int:
         errors.append(f"Source references missing localization keys: {sorted(missing_source)}")
 
     en_formats = formats(ROOT / "Resources/en.lproj/Localizable.strings")
-    zh_formats = formats(ROOT / "Resources/zh-Hans.lproj/Localizable.strings")
-    for key in base_keys:
-        if en_formats.get(key, ()) != zh_formats.get(key, ()):
-            errors.append(f"Format placeholders differ between en and zh-Hans for key: {key}")
+    for language in LANGUAGES[1:]:
+        locale_formats = formats(ROOT / "Resources" / f"{language}.lproj" / "Localizable.strings")
+        for key in base_keys:
+            if en_formats.get(key, ()) != locale_formats.get(key, ()):
+                errors.append(f"Format placeholders differ between en and {language} for key: {key}")
 
     if errors:
         print("Localization validation failed:", file=sys.stderr)
@@ -61,7 +71,7 @@ def main() -> int:
             print(f"- {error}", file=sys.stderr)
         return 1
 
-    print(f"PASS: {len(base_keys)} UI localization keys, {len(source_keys)} source references, 2 languages, matching format placeholders")
+    print(f"PASS: {len(base_keys)} UI localization keys, {len(source_keys)} source references, {len(LANGUAGES)} languages, matching format placeholders")
     return 0
 
 
